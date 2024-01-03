@@ -1,5 +1,9 @@
-import BaseError from "./baseError";
+class BaseError extends Error {
+  constructor(message = "") {
+    super(message);
 
-class unAuthenticatedError extends BaseError {}
+    this.message = message;
+  }
+}
 
-export default unAuthenticatedError;
+export default BaseError;

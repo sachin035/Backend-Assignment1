@@ -7,7 +7,7 @@ const myFormat = printf(({ level, message, timestamp }) => {
   return `${timestamp} [${level}]: ${message}`;
 });
 
-const logger = createLogger({
+const logger: any = createLogger({
   level: "debug",
   format: combine(colorize(), timestamp({ format: "HH:mm:ss" }), myFormat),
   transports: [new transports.Console()],

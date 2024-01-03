@@ -1,9 +1,5 @@
-class BaseError extends Error {
-  constructor(message = "") {
-    super(message);
+import BaseError from "./baseError";
 
-    this.message = message;
-  }
-}
+class BadRequestError extends BaseError {}
 
-export default BaseError;
+export default BadRequestError;

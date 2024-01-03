@@ -4,9 +4,14 @@ import { generateAccessAndRefreshToken } from "../util/tokenGenerator";
 import { verifyJWT } from "../middleware/auth.middleware";
 import bcrypt from "bcrypt";
 import { RequestWithUser } from "../interface/requestUser";
+import { loginSchema, registerSchema } from "../schema/user.schema";
 
 export const registerUser = async (req: Request, res: Response) => {
   const { id, username, password } = req.body;
+  const { error } = registerSchema.validate(req.body);
+  if (error) {
+    throw new Error("error");
+  }
 
   const salt = await bcrypt.genSalt();
   console.log(password);
@@ -29,6 +34,10 @@ export const registerUser = async (req: Request, res: Response) => {
 
 export const loginUser = async (req: Request, res: Response) => {
   const { username, password } = req.body;
+  const { error } = loginSchema.validate(req.body);
+  if (error) {
+    throw new Error("error");
+  }
 
   if ([username, password].some((field) => field?.trim() === "")) {
     throw new Error("field cannot be empty");
