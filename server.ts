@@ -3,6 +3,7 @@ import express, { Application } from "express";
 import router from "./src/routes/user.route";
 import todoRouter from "./src/routes/todo.routes";
 import dotenv from "dotenv";
+import logger from "./src/logger/index";
 
 dotenv.config();
 
@@ -18,5 +19,5 @@ app.use("/", router);
 const port: string | number = process.env.PORT || 3000;
 
 app.listen(port, () => {
-  console.log("connected", port);
+  logger.info("connected", process.env.NODE_ENV);
 });
