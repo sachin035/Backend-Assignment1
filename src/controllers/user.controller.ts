@@ -1,28 +1,33 @@
-import { getUsers, addUser } from "../util/user.js";
-import { generateAccessAndRefreshToken } from "../util/tokenGenerator.js";
-import { verifyJWT } from "../middleware/auth.middleware.js";
-import { getUserById } from "../util/user.js";
+import { Request, Response } from "express";
+import { getUsers, addUser, getUserById } from "../util/user";
+import { generateAccessAndRefreshToken } from "../util/tokenGenerator";
+import { verifyJWT } from "../middleware/auth.middleware";
 import bcrypt from "bcrypt";
+import { RequestWithUser } from "../interface/requestUser";
 
-export const registerUser = async (req, res) => {
-  const { username, password } = req.body;
+export const registerUser = async (req: Request, res: Response) => {
+  const { id, username, password } = req.body;
+
   const salt = await bcrypt.genSalt();
+  console.log(password);
   const hashedPassword = await bcrypt.hash(password, salt);
 
-  if ([username, password].some((field) => field?.trim() === "")) {
+  if ([id, username, password].some((field) => field?.trim() === "")) {
     throw new Error("field cannot be empty");
   }
 
   const user = {
+    id,
     username,
     password: hashedPassword,
   };
+  console.log(hashedPassword);
   const users = addUser(user);
 
-  res.status().json({ user: users, message: "Register successful" });
+  res.status(200).json({ user: users, message: "Register successful" });
 };
 
-export const loginUser = async (req, res) => {
+export const loginUser = async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   if ([username, password].some((field) => field?.trim() === "")) {
@@ -30,6 +35,7 @@ export const loginUser = async (req, res) => {
   }
 
   const users = getUsers();
+  // console.log(users);
   const userExist = users.find((user) => user.username === username);
   if (!userExist) {
     throw new Error("User doesn't exist");
@@ -38,6 +44,7 @@ export const loginUser = async (req, res) => {
   if (!isPasswordValid) {
     throw new Error("Invalid credentials");
   }
+  console.log({ userExist });
 
   const { accessToken, refreshToken } =
     generateAccessAndRefreshToken(userExist);
@@ -47,11 +54,11 @@ export const loginUser = async (req, res) => {
     .status(200)
     .cookie("accessToken", accessToken)
     .cookie("refreshToken", refreshToken)
-    .json("Login successful");
+    .json({ message: "Login successful", accessToken, refreshToken });
 };
 
-export const logoutUser = async (req, res) => {
-  const userExist = getUserById(req.user?.id);
+export const logoutUser = async (req: RequestWithUser, res: Response) => {
+  const userExist = getUserById(req.user?.id!);
   if (!userExist) {
     throw new Error("User not found");
   }
@@ -59,7 +66,7 @@ export const logoutUser = async (req, res) => {
 
   res
     .status(200)
-    .clearCookie("accessToken", options)
-    .clearCookie("refreshToken", options)
+    .clearCookie("accessToken", {})
+    .clearCookie("refreshToken", {})
     .json("User logged out");
 };

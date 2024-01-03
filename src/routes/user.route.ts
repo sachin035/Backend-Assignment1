@@ -3,10 +3,13 @@ import {
   registerUser,
   loginUser,
   logoutUser,
-} from "../controllers/user.controller.js";
-import { verifyJWT } from "../middleware/auth.middleware.js";
+} from "../controllers/user.controller";
+import { verifyJWT } from "../middleware/auth.middleware";
 
-export const router = Router();
+const router: Router = Router();
+
 router.post("/", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", verifyJWT, logoutUser);
+
+export default router;
