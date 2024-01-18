@@ -1,9 +1,11 @@
-import { ParamsDictionary } from "express-serve-static-core";
-import { ParsedQs } from "qs";
-import { User } from "../types/user";
-import { Request } from "express";
+export interface ISignup {
+  username: string;
+  email: string;
+  password: string;
+}
 
-export interface RequestWithUser
-  extends Request<ParamsDictionary, any, any, ParsedQs> {
-  user?: User;
+export interface ILogin {
+  username: string;
+  email: string;
+  password: string;
 }

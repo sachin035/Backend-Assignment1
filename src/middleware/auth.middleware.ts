@@ -1,37 +1,24 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { getUserById } from "../util/user";
-import { RequestWithUser } from "../interface/requestUser";
+import UnauthenticatedError from "../error/unauthenticatedError";
+import config from "../config";
 
-export const verifyJWT = async (
-  req: RequestWithUser,
-  res: Response,
-  next: NextFunction
-) => {
+export const auth = async (req: any, res: Response, next: NextFunction) => {
   try {
-    const token =
-      req.cookies?.accessToken ||
-      req.header("Authorization")?.replace("Bearer ", "") ||
-      "";
+    const token = req.headers.authorization?.split(" ")[1] as string;
 
     if (!token) {
-      throw new Error("Unauthorized");
+      throw new UnauthenticatedError("No access Token");
     }
 
-    const decodedToken = jwt.verify(
-      token,
-      process.env.ACCESS_TOKEN_SECRET as string
-    ) as { id: number }; // Assuming 'id' is the expected field in the token.
+    const user = jwt.verify(token, config.jwt.accessTokenSecret!) as {
+      id: number;
+    };
 
-    const user = getUserById(decodedToken.id);
+    req.user_id = user.id as number;
 
-    if (!user) {
-      throw new Error("Invalid access token");
-    }
-
-    req.user = user;
     next();
-  } catch (error: any) {
-    throw new Error(error?.message || "Invalid access token");
+  } catch (error) {
+    next(error);
   }
 };

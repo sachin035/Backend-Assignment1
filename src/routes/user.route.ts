@@ -1,15 +1,10 @@
 import { Router } from "express";
-import {
-  registerUser,
-  loginUser,
-  logoutUser,
-} from "../controllers/user.controller";
-import { verifyJWT } from "../middleware/auth.middleware";
+import { signup, login } from "../controllers/user.controller";
 
-const router: Router = Router();
+const authRouter = Router();
 
-router.post("/", registerUser);
-router.post("/login", loginUser);
-router.post("/logout", verifyJWT, logoutUser);
+authRouter.post("/", signup);
+authRouter.post("/login", login);
+// router.post("/logout", verifyJWT, logoutUser);
 
-export default router;
+export default authRouter;
